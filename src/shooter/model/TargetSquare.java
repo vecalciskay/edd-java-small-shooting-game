@@ -1,24 +1,19 @@
 package shooter.model;
 
+import shooter.gui.TargetSquareDibujador;
+
 public class TargetSquare extends GameTarget {
 	
-	private final static int ANCHO = 30;
+	public final static int ANCHO = 30;
 
-	private int x;
-	private int y;
 
-	public TargetSquare(int x0, int y0) {
+	public TargetSquare(int x0, int y0, GameBoard gameBoard) {
 		this.x = x0;
 		this.y = y0;
+		dibujador = new TargetSquareDibujador(this);
+		padre = gameBoard;
 	}
 
-	public int getX() {
-		return x;
-	}
-
-	public int getY() {
-		return y;
-	}
 
 	public boolean estaDentro(int x0, int y0) {
 		if (this.x < x0 && 

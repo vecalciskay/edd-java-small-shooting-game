@@ -2,6 +2,8 @@ package shooter.util;
 
 import java.util.Iterator;
 
+import shooter.model.Bullet;
+
 public class Lista<T> implements Iterable<T> {
 
 	protected Nodo<T> inicio;
@@ -105,6 +107,28 @@ public class Lista<T> implements Iterable<T> {
 		actual.setSiguiente(nuevoNodo);
 		
 		tamano++;
+	}
+
+
+	public void eliminar(T o) throws Exception {
+		if (inicio == null)
+			throw new Exception("Lista vacia, nada que eliminar");
+		if (inicio.getContenido() == o) {
+			inicio = inicio.getSiguiente();
+			tamano--;
+			return;
+		}
+		
+		Nodo<T> actual = inicio;
+		while(actual.getSiguiente().getContenido() != o && 
+				actual.getSiguiente() != null) {
+			actual = actual.getSiguiente();
+		}
+		if (actual.getSiguiente() == null)
+			throw new Exception("No existe esa posicion en esta lista");
+		
+		actual.setSiguiente(actual.getSiguiente().getSiguiente());
+		tamano--;
 	}
 	
 	public void eliminar(int pos) throws Exception {

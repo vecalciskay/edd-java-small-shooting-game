@@ -3,8 +3,11 @@ package shooter.model;
 import java.awt.Graphics;
 import java.beans.PropertyChangeSupport;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import shooter.framework.IDibujador;
-import shooter.gui.DibujadorCanon;
+import shooter.gui.CanonDibujador;
 
 /**
  * 
@@ -13,15 +16,13 @@ import shooter.gui.DibujadorCanon;
  */
 public class Canon {
 
-	private final static int MAX_GRADO = 180;
-	private final static int MIN_GRADO = 0;
-	private final static int INITIAL_GRADO = 90;
-	private final static int STEP_GRADO = 3;
-	private final static int STEP_DISPARO = 5;
-	private final static int RADIUS_BASE = 60;
-	private final static int RADIUS_CANON = 100;
-	
-	private PropertyChangeSupport cambiosCanon;
+	public final static int MAX_GRADO = 180;
+	public final static int MIN_GRADO = 0;
+	public final static int INITIAL_GRADO = 90;
+	public final static int STEP_GRADO = 3;
+	public final static int STEP_DISPARO = 5;
+	public final static int RADIUS_BASE = 60;
+	public final static int RADIUS_CANON = 100;
 	
 	private IDibujador dibujador;
 	
@@ -29,11 +30,16 @@ public class Canon {
 	private int x;
 	private int y;
 	
-	public Canon(int base, int alto) {
+	private GameBoard padre;
+	
+	private static final Logger logger = LogManager.getRootLogger();
+	
+	public Canon(int base, int alto, GameBoard gameBoard) {
 		gradoActual = INITIAL_GRADO;
-		dibujador = new DibujadorCanon(this);
+		dibujador = new CanonDibujador(this);
 		x = base / 2 - RADIUS_BASE;
 		y = alto;
+		padre = gameBoard;
 	}
 	
 	public void dibujar(Graphics gc) {
@@ -45,23 +51,26 @@ public class Canon {
 			return;
 		int gradoAnterior = gradoActual;
 		gradoActual -= STEP_GRADO;
-		cambiosCanon.firePropertyChange("canon", gradoAnterior, gradoActual);
+		logger.debug("Canon se mueve a la derecha al angulo " + gradoActual);
+		padre.cambioVista(gradoAnterior, gradoActual);
 	}
 	
 	public void izquierda() {
+		
 		if (gradoActual == MAX_GRADO)
 			return;
 		int gradoAnterior = gradoActual;
 		gradoActual += STEP_GRADO;
-		cambiosCanon.firePropertyChange("canon", gradoAnterior, gradoActual);
+		logger.debug("Canon se mueve a la izquierda al angulo " + gradoActual);
+		padre.cambioVista(gradoAnterior, gradoActual);
 	}
 	
 	public void disparar() {
 		int origenX = x + RADIUS_BASE;
 		int origenY = y;
 		Bullet bala = new Bullet(origenX, origenY, RADIUS_CANON, gradoActual, STEP_DISPARO); 
-		
-		cambiosCanon.firePropertyChange("disparo", bala, bala);
+		logger.info("Nueva bala creada en angulo " + gradoActual);
+		padre.nuevoDisparo(bala);
 	}
 
 	public int getGradoActual() {
@@ -71,4 +80,18 @@ public class Canon {
 	public void setGradoActual(int gradoActual) {
 		this.gradoActual = gradoActual;
 	}
+
+	public int getX() {
+		return x;
+	}
+
+	public int getY() {
+		return y;
+	}
+
+	public double getGradoActualRadian() {
+		return (double)gradoActual * Math.PI / 180.0;
+	}
+	
+	
 }
